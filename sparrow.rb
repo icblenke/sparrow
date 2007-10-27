@@ -21,20 +21,63 @@
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-# =DESCRIPTION
-# Sparrow is a super fast and scalable ruby queue that speaks memcached (get, set)
-
-# Options available:
-# -p, --port [number]              Specify Port                   # Defaults to 11211
-# -c, --cluster [cluster size]     Create a cluster or daemons  
-# -h, --host [string]              Specify Host                   # Defaults to '0.0.0.0'
-# -t, --cleanup-timer [seconds]    Specify Cleanup Timer          # Defaults to 30 seconds
+# Sparrow is a really fast lightweight queue written in Ruby that speaks memcached. 
+# That means you can use Sparrow with any memcached client library (Ruby or otherwise). 
+# 
+# Basic tests shows that Sparrow processes messages at a rate of 850-900 per second. 
+# The load Sparrow can cope with increases exponentially as you add to the cluster. 
+# Sparrow also takes advantage of eventmachine, which uses a non-blocking io, offering great performance.
+# 
+# Sparrow comes with built in support for daemonization and clustering. 
+# Also included are example libraries and clients. For example:
+# 
+# require 'memcached'
+# m = MemCache.new('127.0.0.1:11211', '127.0.0.1:11212', '127.0.0.1:11213')
+# m['queue_name'] = '1' # Publish to queue
+# m['queue_name']       #=> 1 Pull next msg from queue
+# m['queue_name']       #=> nil
+# m.delete('queue_name) # Delete queue
+# 
+# # or using the included client:
+# 
+# class MyQueue < MemCacheQueue
+#   def on_message
+#     logger.info "Received msg with args: #{args.inspect}"
+#   end
+# end
+# 
+# MemCacheQueue.connect('127.0.0.1:11211')
+# MyQueue.publish('test msg')
+# MyQueue.run(true)
+# 
+# Messages are deleted as soon as they're read and the order you add messages to the queue probably won't 
+# be the same order when they're removed.
+# 
+# Additional memcached commands that are supported are:
+# flush_all # Deletes all queues
+# version
+# quit
+# The memcached commands 'add', and 'replace' just call 'set'.
+# 
+# Command line options are:
+# -p, --port [number]              Specify port                   # Defaults to 11211
+# -c, --cluster [cluster size]     Create a cluster of daemons  
+# -h, --host [string]              Specify host                   # Defaults to '0.0.0.0'
+# -t, --cleanup-timer [seconds]    Specify cleanup timer          # Defaults to 30 seconds
 # -l, --debug                      Run in debug mode
 # -d, --daemon                     Daemonize mode
 # -k, --kill [<name>/all]          Kill specified running daemons # Defaults to '*' (all daemons)
-
-# Prerequisites:
-#  - Eventmachine
+# 
+# For example, creating a cluster of three daemons running on consecutive ports (starting on 11211) is as easy as this:
+# ./sparrow -c 3
+# 
+# The only prerequisites are [http://rubyforge.org/projects/eventmachine/ eventmachine]. 
+# The daemonization won't work on Windows. 
+# 
+# Check out the code:
+# svn checkout http://sparrow.googlecode.com/svn/trunk/ sparrow
+# 
+# Sparrow was inspired by Twitter's Starling
 
 # How to use with a ruby client?
 # 1) Install the client
@@ -51,9 +94,6 @@
 #   m['queue_name']       #=> 1 Pull next msg from queue
 #   m['queue_name']       #=> nil
 #   m.delete('queue_name) # Delete queue
-
-# Write - 10000 messages send at a rate of 850-900 msgs/s
-# Read  - 10000 messages read at a rate of 317 msgs/s
 
 require 'rubygems'
 require 'eventmachine'
@@ -353,15 +393,15 @@ class SparrowRunner
         self.options[:port] = v
       end
       
-      opts.on("-c", "--cluster [cluster size]", Integer, "Create a cluster or daemons") do |v|
+      opts.on("-c", "--cluster [cluster size]", Integer, "Create a cluster of daemons") do |v|
         self.options[:cluster] = v 
       end
   
-      opts.on("-h", "--host [string]", String, "Specify Host") do |v|
+      opts.on("-h", "--host [string]", String, "Specify host") do |v|
         self.options[:host] = v 
       end
   
-      opts.on("-t", "--cleanup-timer [seconds]", Integer, "Specify Cleanup Timer") do |v|
+      opts.on("-t", "--cleanup-timer [seconds]", Integer, "Specify cleanup timer") do |v|
         self.options[:cleanup_timer] = v
       end
   
