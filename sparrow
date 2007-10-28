@@ -154,6 +154,7 @@ module Sparrow
     @current_queue = nil
     @expecting_body = false
     @expected_bytes = 0
+    @current_flag = nil
     logger.debug "New client"
   end
   
@@ -208,6 +209,7 @@ module Sparrow
   # <command name> <key> <flags> <exptime> <bytes>\r\n
   def set_command
     @current_queue = args[1]
+    @current_flag = args[2] || 0
     raise ClientError unless @current_queue
     @expected_bytes = args[4].to_i || 0
     @expecting_body = true
@@ -219,6 +221,7 @@ module Sparrow
     if @data.length != @expected_bytes
      raise InvalidBodyLength
     end
+    @data << @current_flag
     logger.debug "Adding message to queue - #{@current_queue}"
     add_message(@current_queue, @data)
     @expected_bytes = 0
@@ -240,7 +243,9 @@ module Sparrow
       rescue NoMoreMessages
         next
       end
-      publish [VALUE, queue, 0, msg.length]
+      flag = msg[-1..-1]
+      msg = msg[0..-2]
+      publish [VALUE, queue, flag, msg.length]
       publish msg
     end
     publish EOF
@@ -316,7 +321,7 @@ module Sparrow
     @@logger.level = Logger::INFO if !SparrowRunner.debug
     @@logger
   rescue
-      @@logger = Logger.new(STDOUT)
+    @@logger = Logger.new(STDOUT)
   end
   
   def self.clear!
