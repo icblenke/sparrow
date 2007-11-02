@@ -193,15 +193,15 @@ module Sparrow
 
   rescue ClientError => e
     logger.error e
-    publish [CLIENT_ERROR, e]
+    publish CLIENT_ERROR, e
     publish ERROR
   rescue => e
     logger.error e
-    publish [SERVER_ERROR, e]
+    publish SERVER_ERROR, e
   end
   
-  def publish d
-    send_data d.to_a.join(' ') + CR
+  def publish *args
+    send_data args.join(' ') + CR
   end
   
   # Storage commands
@@ -245,7 +245,7 @@ module Sparrow
       end
       flag = msg[-1..-1]
       msg = msg[0..-2]
-      publish [VALUE, queue, flag, msg.length]
+      publish VALUE, queue, flag, msg.length
       publish msg
     end
     publish EOF
@@ -274,7 +274,7 @@ module Sparrow
   
   # VERSION
   def version_command
-    publish [VERSION, '0.1']
+    publish VERSION, '0.1'
   end
   
   # QUIT
