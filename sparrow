@@ -441,19 +441,18 @@ class SparrowRunner
   end
   
   def kill_pid(k)
-    begin
-      Dir[File.join(PID_DIR, "sparrow.#{k}.pid")].each do |f|
-        puts f
-        pid = IO.read(f).chomp.to_i
-        Process.kill(9, pid)
-        FileUtils.rm f
-        puts "killed PID: #{pid}"
+    Dir[File.join(PID_DIR, "sparrow.#{k}.pid")].each do |f|
+      begin
+      puts f
+      pid = IO.read(f).chomp.to_i
+      FileUtils.rm f
+      Process.kill(9, pid)
+      puts "killed PID: #{pid}"
+      rescue => e
+        puts "Failed to kill! #{k}: #{e}"
       end
-    rescue
-      puts "Failed to kill! #{k}"
-    ensure  
-      exit
     end
+    exit
   end
 
   def daemonize(port, options)
