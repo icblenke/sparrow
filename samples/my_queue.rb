@@ -1,3 +1,6 @@
+
+# See client/mq2.rb for a better client
+
 require 'mem_cache_queue'
 
 class MyQueue < MemCacheQueue
