@@ -443,11 +443,11 @@ class SparrowRunner
   def kill_pid(k)
     Dir[File.join(PID_DIR, "sparrow.#{k}.pid")].each do |f|
       begin
-      puts f
-      pid = IO.read(f).chomp.to_i
-      FileUtils.rm f
-      Process.kill(9, pid)
-      puts "killed PID: #{pid}"
+        puts f
+        pid = IO.read(f).chomp.to_i
+        FileUtils.rm f
+        Process.kill(9, pid)
+        puts "killed PID: #{pid}"
       rescue => e
         puts "Failed to kill! #{k}: #{e}"
       end
