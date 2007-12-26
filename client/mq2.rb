@@ -558,10 +558,10 @@ end
 # SQS.secret_access_key = 'YOURSECRETACCESSKEY'
    
 # servers = [
-#   EventMachine::Protocols::Memcache.new({:host => 'localhost', :port => 11211, :weight => 1}),
-#   EventMachine::Protocols::Memcache.new({:host => 'localhost', :port => 11212, :weight => 1}),
-#   EventMachine::Protocols::Memcache.new({:host => 'localhost', :port => 11213, :weight => 1}),
-#   EventMachine::Protocols::Memcache.new({:host => 'localhost', :port => 11214, :weight => 1}),
+#   EventMachine::Protocols::Memcache.new(nil, {:host => 'localhost', :port => 11211, :weight => 1}),
+#   EventMachine::Protocols::Memcache.new(nil, {:host => 'localhost', :port => 11212, :weight => 1}),
+#   EventMachine::Protocols::Memcache.new(nil, {:host => 'localhost', :port => 11213, :weight => 1}),
+#   EventMachine::Protocols::Memcache.new(nil, {:host => 'localhost', :port => 11214, :weight => 1}),
 #   EventMachine::Protocols::SQSWrapper.new({:weight => 0})
 # ]
 
