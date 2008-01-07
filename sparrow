@@ -32,7 +32,7 @@
 # Also included are example libraries and clients. For example:
 # 
 # require 'memcached'
-# m = MemCache.new('127.0.0.1:11211', '127.0.0.1:11212', '127.0.0.1:11213')
+# m = MemCache.new('127.0.0.1:11212', '127.0.0.1:11213', '127.0.0.1:11214')
 # m['queue_name'] = '1' # Publish to queue
 # m['queue_name']       #=> 1 Pull next msg from queue
 # m['queue_name']       #=> nil
@@ -46,7 +46,7 @@
 #   end
 # end
 # 
-# MemCacheQueue.connect('127.0.0.1:11211')
+# MemCacheQueue.connect('127.0.0.1:11212')
 # MyQueue.publish('test msg')
 # MyQueue.run(true)
 # 
@@ -60,7 +60,7 @@
 # The memcached commands 'add', and 'replace' just call 'set'.
 # 
 # Command line options are:
-# -p, --port [number]              Specify port                   # Defaults to 11211
+# -p, --port [number]              Specify port                   # Defaults to 11212
 # -c, --cluster [cluster size]     Create a cluster of daemons  
 # -h, --host [string]              Specify host                   # Defaults to '0.0.0.0'
 # -t, --cleanup-timer [seconds]    Specify cleanup timer          # Defaults to 30 seconds
@@ -68,7 +68,7 @@
 # -d, --daemon                     Daemonize mode
 # -k, --kill [<name>/all]          Kill specified running daemons # Defaults to '*' (all daemons)
 # 
-# For example, creating a cluster of three daemons running on consecutive ports (starting on 11211) is as easy as this:
+# For example, creating a cluster of three daemons running on consecutive ports (starting on 11212) is as easy as this:
 # ./sparrow -c 3
 # 
 # The only prerequisites are [http://rubyforge.org/projects/eventmachine/ eventmachine]. 
@@ -89,7 +89,7 @@
 #   Example client usage for a sparrow cluster (./sparrow.rb -c 3):
 # 
 #   require 'memcached'
-#   m = MemCache.new('127.0.0.1:11211', '127.0.0.1:11212', '127.0.0.1:11213')
+#   m = MemCache.new('127.0.0.1:11212', '127.0.0.1:11213', '127.0.0.1:11214')
 #   m['queue_name'] = '1' # Publish to queue
 #   m['queue_name']       #=> 1 Pull next msg from queue
 #   m['queue_name']       #=> nil
@@ -365,7 +365,7 @@ class SparrowRunner
   def initialize(ops = {})
     parse_options(ops)
 
-    self.options[:port] ||= 11211
+    self.options[:port] ||= 11212
     self.options[:host] ||= "0.0.0.0"
     self.options[:cleanup_timer] ||= 30
     self.options[:cluster] ||= 1
