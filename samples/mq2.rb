@@ -1,3 +1,6 @@
+# See mq3.rb for a better client
+
+
 require 'eventmachine'
 require 'socket'
 require 'sqs'

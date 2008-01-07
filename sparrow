@@ -182,13 +182,13 @@ module Sparrow
         elsif @expecting_body
           process_body
         else
-          raise StatementInvalid
+          raise StatementInvalid, ln
         end
         @data = ''
         @split_args = nil
       end
     else
-      raise StatementInvalid
+      raise StatementInvalid, ln
     end
 
   rescue ClientError => e
@@ -221,6 +221,7 @@ module Sparrow
     if @data.length != @expected_bytes
      raise InvalidBodyLength
     end
+    p @data
     @data << @current_flag
     logger.debug "Adding message to queue - #{@current_queue}"
     add_message(@current_queue, @data)
@@ -298,6 +299,8 @@ module Sparrow
         FileUtils.rm mv_path
         return data
       rescue => e
+        # Usually would happen when a message is being processed 
+        # simultaneously by another Sparrow instance
         logger.debug "Error reading next message:" + e
         next 
       end

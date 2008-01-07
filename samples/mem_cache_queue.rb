@@ -2,7 +2,7 @@ require 'memcache'
 require 'logger'
 require 'fileutils'
 
-# See client/mq2.rb for a better client
+# See mq3.rb for a better client
 
 class MemCacheQueue
   PID_DIR = File.join(File.dirname(__FILE__), '..', 'pids')

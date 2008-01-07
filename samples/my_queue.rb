@@ -1,5 +1,5 @@
 
-# See client/mq2.rb for a better client
+# See mq3.rb for a better client
 
 require 'mem_cache_queue'
 
