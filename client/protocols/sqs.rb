@@ -1,3 +1,5 @@
+require 'sqs'
+
 module MQ3
   module Protocols
     class SQS
