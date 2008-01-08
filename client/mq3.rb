@@ -31,7 +31,7 @@ module MQ3
       end
     
       def poll
-        send_to_server {|server|
+        send_to_server(true) {|server|
           server[queue_name]
         }
       end
@@ -51,7 +51,8 @@ module MQ3
       private
       
       def send_to_server(random = false, &block)
-        alive_servers.sort_by{ random ? rand : 1 }.each do |server|
+        srvs = random ? unsorted_servers : sorted_servers
+        srvs.each do |server|
           begin
             return yield(server)
           rescue MQ3::Protocols::ConnectionError
@@ -106,7 +107,12 @@ module MQ3
       end
       
       def alive_servers
-        servers.select {|a| a.alive? }.sort_by {|b| b.weight }.reverse
+        servers.select {|a| a.alive? }.sort_by {|b| rand }
+      end
+      alias unsorted_servers alive_servers
+      
+      def sorted_servers
+        alive_servers.sort_by {|b| b.weight }.reverse
       end
 
     end # self

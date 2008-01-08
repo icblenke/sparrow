@@ -100,6 +100,7 @@ require 'eventmachine'
 require 'uuid'
 require 'fileutils'
 require 'optparse'
+require 'find'
 
 module Sparrow
   
@@ -182,13 +183,13 @@ module Sparrow
         elsif @expecting_body
           process_body
         else
-          raise StatementInvalid, ln
+          raise StatementInvalid
         end
         @data = ''
         @split_args = nil
       end
     else
-      raise StatementInvalid, ln
+      raise StatementInvalid
     end
 
   rescue ClientError => e
@@ -221,7 +222,6 @@ module Sparrow
     if @data.length != @expected_bytes
      raise InvalidBodyLength
     end
-    p @data
     @data << @current_flag
     logger.debug "Adding message to queue - #{@current_queue}"
     add_message(@current_queue, @data)
@@ -237,6 +237,7 @@ module Sparrow
   def get_command
     args.shift # get rid of the command
     raise ClientError if args.empty?
+    rsp = []
     args.each do |queue|
       begin
         logger.debug "Getting message from queue - #{queue}"
@@ -246,10 +247,11 @@ module Sparrow
       end
       flag = msg[-1..-1]
       msg = msg[0..-2]
-      publish VALUE, queue, flag, msg.length
-      publish msg
+      rsp << [VALUE, queue, flag, msg.length].join(' ')
+      rsp << msg
     end
-    publish EOF
+    rsp << EOF
+    send_data(rsp.join(CR) + CR)
   end
   
   # Other commands
@@ -289,9 +291,10 @@ module Sparrow
   # Queue methods
   
   def next_message(queue_name)
-    Dir.glob(File.join(BASE_DIR, queue_name, '*', '*', '*', '*', '*')).each do |path|
+    while path = find_next_file(queue_name)
+      next unless File.exists?(path)
+      next unless File.extname(path) == '.msg'
       begin
-        next unless File.extname(path) == '.msg'
         mv_path = File.join(PROCESSING_DIR, new_file_name(queue_name))
         FileUtils.mkdir_p(File.dirname(mv_path))
         FileUtils.mv path, mv_path
@@ -305,7 +308,14 @@ module Sparrow
         next 
       end
     end
-    raise NoMoreMessages
+  end
+  
+  def find_next_file(queue_name)
+    @@files ||= []
+    return @@files.pop unless @@files.empty?
+    @@files = Dir.glob(File.join(BASE_DIR, queue_name, '*', '*', '*', '*', '*')).select {|a| !File.directory?(a) } 
+    raise NoMoreMessages if @@files.empty?
+    @@files.pop
   end
   
   def add_message(queue_name, msg)

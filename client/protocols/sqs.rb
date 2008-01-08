@@ -50,6 +50,6 @@ module MQ3
             SQS.create_queue(q)
           end
       end
-    
+    end
   end
 end
