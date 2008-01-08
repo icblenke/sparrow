@@ -40,15 +40,17 @@
 # 
 # # or using the included client:
 # 
-# class MyQueue < MemCacheQueue
+# class MyQueue < MQ3::Queue
 #   def on_message
 #     logger.info "Received msg with args: #{args.inspect}"
 #   end
 # end
 # 
-# MemCacheQueue.connect('127.0.0.1:11212')
+# MyQueue.servers = [
+#   MQ3::Protocols::Memcache.new({:host => '127.0.0.1', :port => 11212, :weight => 1})
+# ]
 # MyQueue.publish('test msg')
-# MyQueue.run(true)
+# MyQueue.run
 # 
 # Messages are deleted as soon as they're read and the order you add messages to the queue probably won't 
 # be the same order when they're removed.
@@ -71,7 +73,7 @@
 # For example, creating a cluster of three daemons running on consecutive ports (starting on 11212) is as easy as this:
 # ./sparrow -c 3
 # 
-# The only prerequisites are [http://rubyforge.org/projects/eventmachine/ eventmachine]. 
+# The only prerequisite is [http://rubyforge.org/projects/eventmachine/ eventmachine]. 
 # The daemonization won't work on Windows. 
 # 
 # Check out the code:
@@ -79,28 +81,11 @@
 # 
 # Sparrow was inspired by Twitter's Starling
 
-# How to use with a ruby client?
-# 1) Install the client
-#     preferably install from http://www.deveiate.org/code/Ruby-MemCache-0.0.4.zip
-#   or
-#     gem install memcache-client
-#   (The gem version of Ruby-MemCache is outdated)
-# 2) 
-#   Example client usage for a sparrow cluster (./sparrow.rb -c 3):
-# 
-#   require 'memcached'
-#   m = MemCache.new('127.0.0.1:11212', '127.0.0.1:11213', '127.0.0.1:11214')
-#   m['queue_name'] = '1' # Publish to queue
-#   m['queue_name']       #=> 1 Pull next msg from queue
-#   m['queue_name']       #=> nil
-#   m.delete('queue_name) # Delete queue
-
 require 'rubygems'
 require 'eventmachine'
 require 'uuid'
 require 'fileutils'
 require 'optparse'
-require 'find'
 
 module Sparrow
   
