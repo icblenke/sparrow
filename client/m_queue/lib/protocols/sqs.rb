@@ -26,7 +26,7 @@ module MQueue
       end
   
       def delete!
-        SQS.each_queue do |q|
+        ::SQS.each_queue do |q|
           q.delete!
         end
       end
@@ -47,9 +47,9 @@ module MQueue
         @queues ||= {}
         @queues[queue_name] ||=
           begin
-            SQS.get_queue(q)
+            ::SQS.get_queue(queue_name)
           rescue SQS::UnavailableQueue
-            SQS.create_queue(q)
+            ::SQS.create_queue(queue_name)
           end
       end
     end
