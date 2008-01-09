@@ -1,9 +1,9 @@
-module MQ3
+module AQueue
   module Protocols
     class Memcache
       attr_accessor :options
 
-      LOG_DIR             = File.join(MQ3_ROOT, 'log')
+      LOG_DIR             = File.join(AQUEUE_ROOT, 'log')
 
       CR                  = "\r\n"     
       ERROR               = "ERROR"    
@@ -55,7 +55,7 @@ module MQ3
         @socket.gets
       end
   
-      # MQ3 Protocol API
+      # AQueue Protocol API
 
       def alive?
         (!@retry or @retry < Time.now)

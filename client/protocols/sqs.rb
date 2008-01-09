@@ -1,6 +1,6 @@
 require 'sqs'
 
-module MQ3
+module AQueue
   module Protocols
     class SQS
       attr_accessor :options
@@ -31,7 +31,7 @@ module MQ3
         end
       end
       
-      # MQ3 Protocol API
+      # AQueue Protocol API
   
       def alive?
         true
