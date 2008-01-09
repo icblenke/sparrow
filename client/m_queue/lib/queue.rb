@@ -132,7 +132,7 @@ module MQueue
       0
     end
     
-    def on_message
+    def on_message(msg)
       raise 'You must implement on_message.'
     end
     
