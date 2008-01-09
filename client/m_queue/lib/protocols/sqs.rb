@@ -16,11 +16,11 @@ module MQueue
         raise ConnectionError
       end
       
-      def []
-        msg = queue(q).receive_message
+      def [](queue_name)
+        msg = queue(queue_name).receive_message
         msg.body if msg
       end
-      
+            
       def delete(queue_name)
         queue(queue_name).delete!
       end
