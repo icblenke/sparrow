@@ -2,7 +2,7 @@ require 'socket'
 
 module MQueue
   module Protocols
-    class Memcache
+    class Sparrow
       attr_accessor :options
 
       LOG_DIR             = File.join(MQueue::MQUEUE_ROOT, 'log')
