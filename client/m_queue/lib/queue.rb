@@ -20,6 +20,7 @@ module MQueue
         send_to_server {|server|
           server[queue_name] = msg.to_yaml
         }
+        msg
       end
     
       def poll
