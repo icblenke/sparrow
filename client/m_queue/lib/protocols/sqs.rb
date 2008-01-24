@@ -48,7 +48,7 @@ module MQueue
         @queues[queue_name] ||=
           begin
             ::SQS.get_queue(queue_name)
-          rescue SQS::UnavailableQueue
+          rescue ::SQS::UnavailableQueue
             ::SQS.create_queue(queue_name)
           end
       end
