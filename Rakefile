@@ -4,7 +4,7 @@ require 'rubygems'
 require 'hoe'
 require './lib/sparrow.rb'
 
-Hoe.new('sparrow', Sparrow_1::VERSION) do |p|
+Hoe.new('sparrow', Sparrow::VERSION) do |p|
   p.rubyforge_name = 'Sparrow'
   p.author = 'Alex MacCAw'
   p.email = 'info@eribium.org'
