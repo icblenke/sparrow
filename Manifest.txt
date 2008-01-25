@@ -4,3 +4,4 @@ README.txt
 Rakefile
 bin/sparrow
 lib/sparrow.rb
+lib/sparrow

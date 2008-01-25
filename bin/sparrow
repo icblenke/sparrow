@@ -1,4 +1,3 @@
 #!/usr/bin/env ruby
-require 'ruby-debug'
 require File.join(File.dirname(__FILE__), '..', 'lib', 'sparrow')
 Sparrow::Runner.run

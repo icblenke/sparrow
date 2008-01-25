@@ -1,6 +1,7 @@
+require 'logger'
+
 $:.unshift(File.dirname(__FILE__))
 require 'sparrow/utils'
-require 'logger'
 
 module Sparrow
   
