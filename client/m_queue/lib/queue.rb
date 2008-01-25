@@ -48,7 +48,7 @@ module MQueue
         srvs.each do |server|
           begin
             return yield(server)
-          rescue MQueue::Protocols::ConnectionError
+          rescue MQueue::Protocols::ConnectionError, Errno::ECONNRESET
             # Server will be marked dead
             next
           end
