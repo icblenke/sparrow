@@ -44,16 +44,7 @@ Sparrow
   # quit
   # The memcached commands 'add', and 'replace' just call 'set'.
   # 
-  # Command line options are:
-  # -p, --port [number]              Specify port                   # Defaults to 11212
-  # -c, --cluster [cluster size]     Create a cluster of daemons  
-  # -h, --host [string]              Specify host                   # Defaults to '0.0.0.0'
-  # -l, --debug                      Run in debug mode
-  # -d, --daemon                     Daemonize mode
-  # -k, --kill [<name>/all]          Kill specified running daemons # Defaults to '*' (all daemons)
-  # 
-  # For example, creating a cluster of three daemons running on consecutive ports (starting on 11212) is as easy as this:
-  # ./sparrow -c 3
+  # Call sparrow with --help for usage options
   # 
   # The daemonization won't work on Windows. 
   # 
