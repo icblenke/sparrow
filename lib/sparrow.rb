@@ -40,7 +40,7 @@ module Sparrow
     end
   
     def pid_path
-      options[:pid_path] || File.join(%w( / var run sparrow.#{options[:port]}.pid ))
+      options[:pid_path] || File.join(%w( / var run ), "sparrow.#{options[:port]}.pid" )
     end
   end
 end

@@ -16,11 +16,14 @@ module Sparrow
         :host => "0.0.0.0",
         :port => 11212,
         :debug => false,
-        :base_dir => base_dir,
-        :pid_path => pid_path,
-        :log_path => log_path,
         :type => 'disk'
       }
+      
+      self.options.merge!({
+        :base_dir => base_dir,
+        :pid_path => pid_path,
+        :log_path => log_path
+      })
       
       parse_options
       
