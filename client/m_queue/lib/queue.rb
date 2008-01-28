@@ -41,6 +41,12 @@ module MQueue
         @@servers ||= []
       end
       
+      def reload!
+        servers.each do |s|
+          s.reload! if s.respond_to?('reload!')
+        end
+      end
+      
       private
       
       def send_to_server(random = false, &block)

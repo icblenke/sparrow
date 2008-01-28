@@ -66,6 +66,13 @@ module MQueue
       def weight
     	  options[:weight] || 0  
       end
+      
+      def reload!
+        @retry = nil
+        @socket.close if @socket && !@socket.closed?
+        @socket = nil
+        @status = "Reloading"
+      end
 
       private
   
