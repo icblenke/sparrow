@@ -12,7 +12,7 @@ module MQueue
           loop do
             msg = poll
             self.new.process(msg) if msg
-            sleep 0.1 if !msg
+            sleep 0.5 if !msg
           end
         }
       end
