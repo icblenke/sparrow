@@ -102,7 +102,6 @@ module Sparrow
       publish CLIENT_ERROR, e
       publish ERROR
     rescue => e
-      debugger
       logger.error e
       publish SERVER_ERROR, e
     end

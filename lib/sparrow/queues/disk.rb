@@ -27,7 +27,7 @@ module Sparrow
         data = sprintf(TRX_PUSH, size, value)
         trxw.seek(0, IO::SEEK_END)
         trxw.write data
-        trxw.fsync
+        # trxw.fsync
         rotate_queue if trxw.pos > max_log_size
         self.count_all += 1
         value
@@ -48,7 +48,7 @@ module Sparrow
           e_pos = trxr.pos
           trxr.seek(s_pos, IO::SEEK_SET)
           trxr.write(TRX_POP)
-          trxr.fsync
+          # trxr.fsync
           trxr.pos = e_pos
           next unless value
           return value
