@@ -13,11 +13,13 @@ module Sparrow
       attr_accessor :queue_name
       attr_accessor :trxr
       attr_accessor :trxw
-      attr_accessor :count_all
+      attr_accessor :count_pop
+      attr_accessor :count_push
     
       def initialize(queue_name)
         self.queue_name = queue_name
-        self.count_all = 0
+        self.count_pop = 0
+        self.count_push = 0
         open_queue
       end
     
@@ -29,7 +31,7 @@ module Sparrow
         trxw.write data
         # trxw.fsync
         rotate_queue if trxw.pos > max_log_size
-        self.count_all += 1
+        self.count_push += 1
         value
       end
     
@@ -51,6 +53,7 @@ module Sparrow
           # trxr.fsync
           trxr.pos = e_pos
           next unless value
+          self.count_pop += 1
           return value
         end
         
@@ -69,6 +72,7 @@ module Sparrow
       end
       
       def count
+        self.count_push - self.count_pop
       end
       
       private

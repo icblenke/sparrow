@@ -1,3 +1,4 @@
+require 'socket'
 module Sparrow
   module Server
     include Sparrow::Miscel
@@ -32,6 +33,8 @@ module Sparrow
   
     VERSION         = "VERSION"
     
+    STATS           = "STATS"
+    
     SET_REGEX       = /\ASET\s/i
     ADD_REGEX       = /\AADD\s/i
     REPLACE_REGEX   = /\AREPLACE\s/i
@@ -40,6 +43,21 @@ module Sparrow
     QUIT_REGEX      = /\AQUIT/i
     FLUSH_ALL_REGEX = /\AFLUSH_ALL/i
     VERSION_REGEX   = /\AVERSION/i
+    STATS_REGEX     = /\ASTATS/i
+    
+    mattr_accessor :bytes_read
+    mattr_accessor :bytes_written
+    mattr_accessor :connections_made
+    mattr_accessor :connections_lost
+    mattr_accessor :get_count
+    mattr_accessor :set_count
+    
+    self.bytes_read = 0
+    self.bytes_written = 0
+    self.connections_made = 0
+    self.connections_lost = 0
+    self.get_count = 0
+    self.set_count = 0
 
     def post_init
       @current_queue = nil
@@ -47,11 +65,23 @@ module Sparrow
       @expected_bytes = 0
       @current_flag = nil
       @buffer = ''
-      logger.debug "New client"
+      self.connections_made += 1
+      logger.debug "New client [#{client_ip}]"
+    end
+    
+    def unbind
+      self.connections_lost += 1
+      logger.debug "Lost client"
+    end
+    
+    def send_data(data)
+      self.bytes_written += 1
+      super(data)
     end
     
     def receive_data(data)
       logger.debug "Receiving data: #{data}"
+      self.bytes_read += 1
       @buffer << data
       @buffer = process_whole_messages(@buffer)
     end
@@ -89,6 +119,8 @@ module Sparrow
         version_command
       elsif ln =~ FLUSH_ALL_REGEX
         flush_all_command
+      elsif ln =~ STATS_REGEX
+        stats_command
       elsif @expecting_body
         process_body
       else
@@ -130,6 +162,7 @@ module Sparrow
       @data << @current_flag
       logger.debug "Adding message to queue - #{@current_queue}"
       Sparrow::Queue.add_message(@current_queue, @data)
+      self.set_count += 1
       @expected_bytes = 0
       @current_queue = nil
       @expecting_body = false
@@ -144,8 +177,8 @@ module Sparrow
       raise ClientError if args.empty?
       rsp = []
       args.each do |queue|
+        logger.debug "Getting message from queue - #{queue}"
         begin
-          logger.debug "Getting message from queue - #{queue}"
           msg = Sparrow::Queue.next_message(queue)
           next unless msg
         rescue NoMoreMessages
@@ -155,6 +188,7 @@ module Sparrow
         msg = msg[0..-2]
         rsp << [VALUE, queue, flag, msg.length].join(' ')
         rsp << msg
+        self.get_count += 1
       end
       rsp << EOF
       send_data(rsp.join(CR) + CR)
@@ -170,6 +204,22 @@ module Sparrow
       else
         publish NOT_FOUND
       end
+    end
+    
+    def stats_command
+      rsp = []
+      stats_hash = Sparrow::Queue.get_stats(args[1])
+      stats_hash[:curr_connections]   = (self.connections_made - self.connections_lost)
+      stats_hash[:total_connections]  = self.connections_made
+      stats_hash[:bytes_read]         = self.bytes_read
+      stats_hash[:bytes_written]      = self.bytes_written
+      stats_hash[:get_count]          = self.get_count
+      stats_hash[:set_count]          = self.set_count
+      stats_hash.each do |key, value|
+        rsp << [STATS, key, value].join(' ')
+      end
+      rsp << EOF
+      send_data(rsp.join(CR) + CR)
     end
   
     # FLUSH_ALL
@@ -194,6 +244,10 @@ module Sparrow
   
     def args
       @split_args ||= @data.split(' ')
+    end
+    
+    def client_ip
+      Socket.unpack_sockaddr_in(get_peername)[1]
     end
   
   end

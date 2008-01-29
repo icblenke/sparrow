@@ -16,7 +16,8 @@ module Sparrow
         :host => "0.0.0.0",
         :port => 11212,
         :debug => false,
-        :type => 'disk'
+        :type => 'disk',
+        :start_time => Time.now
       }
       
       self.options.merge!({

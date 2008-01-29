@@ -6,11 +6,13 @@ module Sparrow
     
       attr_accessor :queue_name
       attr_accessor :db
-      attr_accessor :count_all
+      attr_accessor :count_pop
+      attr_accessor :count_push
     
       def initialize(queue_name)
         self.queue_name = queue_name
-        self.count_all = 0
+        self.count_pop = 0
+        self.count_push = 0
         db_exists = File.exists?(db_path)
         self.db = SQLite3::Database.new( db_path )
         if !db_exists
@@ -26,14 +28,15 @@ module Sparrow
       end
         
       def push(value)
-        self.count_all += 1
         db.execute("INSERT INTO queues (data) VALUES (?);", value)
+        self.count_push += 1
         value
       end
     
       def pop
         id, value = db.get_first_row("SELECT * FROM queues LIMIT 1;")
         db.execute("DELETE FROM queues WHERE id = ?", id)
+        self.count_pop += 1
         value
       end
     
