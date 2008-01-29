@@ -39,8 +39,9 @@ module Sparrow
       def get_stats(queue_name)
         stats = {
           :type => Sparrow.options[:type],
-          :total_bytes => File.size?(Sparrow.base_dir),
-          :number_of_queus => queues.keys.length,
+          :total_bytes => (File.size?(Sparrow.base_dir) || 0),
+          :queues  => Dir.glob(File.join(Sparrow.base_dir, '*')).collect {|s| File.basename(s) }.join(','),
+          :number_of_queues => queues.keys.length,
           :debug => Sparrow.options[:debug],
           :pid => Process.pid,
           :uptime => Time.now - Sparrow.options[:start_time],
@@ -52,7 +53,7 @@ module Sparrow
         if queue_name
           queue = get_queue(queue_name)
           stats.merge!({
-            :bytes => Dir.glob(File.join(Sparrow.base_dir, queue_name + '**')).inject(0){|a, b| File.size?(0) },
+            :bytes => Dir.glob(File.join(Sparrow.base_dir, queue_name + '**')).inject(0){|a, b| a += (File.size?(b) || 0); a },
             :total_items => queue.count_push, 
             :curr_items => queue.count
           })
