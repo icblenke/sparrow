@@ -209,12 +209,14 @@ module Sparrow
     def stats_command
       rsp = []
       stats_hash = Sparrow::Queue.get_stats(args[1])
-      stats_hash[:curr_connections]   = (self.connections_made - self.connections_lost)
-      stats_hash[:total_connections]  = self.connections_made
-      stats_hash[:bytes_read]         = self.bytes_read
-      stats_hash[:bytes_written]      = self.bytes_written
-      stats_hash[:get_count]          = self.get_count
-      stats_hash[:set_count]          = self.set_count
+      stats_hash.merge!({
+        :curr_connections   => (self.connections_made - self.connections_lost),
+        :total_connections  => self.connections_made,
+        :bytes_read         => self.bytes_read,
+        :bytes_written      => self.bytes_written,
+        :get_count          => self.get_count,
+        :set_count          => self.set_count
+      })
       stats_hash.each do |key, value|
         rsp << [STATS, key, value].join(' ')
       end
