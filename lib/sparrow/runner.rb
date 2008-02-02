@@ -28,6 +28,9 @@ module Sparrow
       
       parse_options
       
+      FileUtils.mkdir_p(options[:base_dir])
+      FileUtils.mkdir_p(File.dirname(options[:log_path]))
+      
       if options.include?(:kill)
         kill_pid(options[:port])
       end
@@ -79,7 +82,6 @@ module Sparrow
         
         opts.on("-b", "--base PATH", String, "Path to queue data store.", "(default: #{options[:base_dir]})") do |v|
           options[:base_dir] = File.expand_path(v)
-          FileUtils.mkdir_p(options[:base_dir])
         end
         
         opts.on("-t", "--type QUEUE_TYPE", String, "Type of queue (disk/memory/sqlite).", "(default: #{options[:type]})") do |v|
@@ -118,7 +120,6 @@ module Sparrow
         
         opts.on("-l", "--log [FILE]", String, "Path to print debugging information.") do |v|
           options[:log_path] = File.expand_path(v)
-          FileUtils.mkdir_p(File.dirname(options[:log_path]))
         end
         
         opts.on("-e", "--debug", "Run in debug mode", "(default: #{options[:debug]})") do |v|
@@ -144,7 +145,7 @@ module Sparrow
     
     def store_pid(pid)
      FileUtils.mkdir_p(pid_dir)
-     File.open("sparrow.#{options[:port]}.pid", 'w'){|f| f.write("#{pid}\n") }
+     File.open(File.join(pid_dir, "sparrow.#{options[:port]}.pid"), 'w'){|f| f.write("#{pid}\n") }
     end
 
     def kill_pid(k)
