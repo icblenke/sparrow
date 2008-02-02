@@ -32,15 +32,15 @@ module Sparrow
     end
   
     def base_dir
-      options[:base_dir] || File.join(%w( / var spool sparrow ))
+      options[:base_dir] || File.join(%w( / var spool sparrow base ))
     end
   
     def log_path
       options[:log_path] || File.join(%w( / var run sparrow.log ))
     end
   
-    def pid_path
-      options[:pid_path] || File.join(%w( / var run ), "sparrow.#{options[:port]}.pid" )
+    def pid_dir
+      options[:pid_dir] || File.join(%w( / var run sparrow pids ))
     end
   end
 end

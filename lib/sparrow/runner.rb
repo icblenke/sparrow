@@ -22,14 +22,18 @@ module Sparrow
       
       self.options.merge!({
         :base_dir => base_dir,
-        :pid_path => pid_path,
+        :pid_dir => pid_dir,
         :log_path => log_path
       })
       
       parse_options
       
       if options.include?(:kill)
-        kill_pid(options[:kill] || '*')
+        kill_pid(options[:port])
+      end
+      
+      if options.include?(:kill_all)
+        kill_pid('*')
       end
       
       if !options[:daemonize]
@@ -75,6 +79,7 @@ module Sparrow
         
         opts.on("-b", "--base PATH", String, "Path to queue data store.", "(default: #{options[:base_dir]})") do |v|
           options[:base_dir] = File.expand_path(v)
+          FileUtils.mkdir_p(options[:base_dir])
         end
         
         opts.on("-t", "--type QUEUE_TYPE", String, "Type of queue (disk/memory/sqlite).", "(default: #{options[:type]})") do |v|
@@ -93,22 +98,27 @@ module Sparrow
         
         opts.separator ""; opts.separator "Daemonization:"
         
-        opts.on("-P", "--pid FILE", String, "save PID in FILE when using -d option.", "(default: #{options[:pid_path]})") do |v|
-          options[:pid_path] = File.expand_path(v)
+        opts.on("-P", "--pid FILE", String, "save PID in DIR when using -d option.", "(default: #{options[:pid_dir]})") do |v|
+          options[:pid_dir] = File.expand_path(v)
         end
         
         opts.on("-d", "--daemon", "Daemonize mode") do |v|
           options[:daemonize] = v
         end
 
-        opts.on("-k", "--kill PORT", String, "Kill specified running daemons - leave blank to kill all.") do |v|
+        opts.on("-k", "--kill", "Kill daemons on port #{options[:port]}.") do |v|
           options[:kill] = v
+        end
+        
+        opts.on("-j", "--kill-all", String, "Kill specified running daemons - leave blank to kill all.") do |v|
+          options[:kill_all] = v
         end
         
         opts.separator ""; opts.separator "Logging:"
         
         opts.on("-l", "--log [FILE]", String, "Path to print debugging information.") do |v|
           options[:log_path] = File.expand_path(v)
+          FileUtils.mkdir_p(File.dirname(options[:log_path]))
         end
         
         opts.on("-e", "--debug", "Run in debug mode", "(default: #{options[:debug]})") do |v|
@@ -133,12 +143,12 @@ module Sparrow
     private
     
     def store_pid(pid)
-     FileUtils.mkdir_p(File.dirname(pid_path))
-     File.open(pid_path, 'w'){|f| f.write("#{pid}\n")}
+     FileUtils.mkdir_p(pid_dir)
+     File.open("sparrow.#{options[:port]}.pid", 'w'){|f| f.write("#{pid}\n") }
     end
 
     def kill_pid(k)
-      Dir[options[:pid_path]||File.join(File.dirname(pid_dir), "sparrow.#{k}.pid")].each do |f|
+      Dir[File.join(pid_dir, "sparrow.#{k}.pid")].each do |f|
         begin
         puts f
         pid = IO.read(f).chomp.to_i

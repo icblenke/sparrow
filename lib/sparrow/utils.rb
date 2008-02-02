@@ -105,8 +105,8 @@ module Sparrow
       Sparrow.log_path
     end
   
-    def pid_path
-      Sparrow.log_path
+    def pid_dir
+      Sparrow.pid_dir
     end
     
     def logger
