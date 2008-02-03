@@ -67,11 +67,11 @@ module MQueue
       
       def store_pid(pid)
        FileUtils.mkdir_p(PID_DIR)
-       File.open(File.join(PID_DIR, "#{queue_name}.#{pid}.pid"), 'w'){|f| f.write("#{pid}\n")}
+       File.open(File.join(PID_DIR, "poller.#{queue_name}.pid"), 'w'){|f| f.write("#{pid}\n")}
       end
 
-      def kill_pid(k, name = queue_name)
-        Dir[File.join(PID_DIR, "#{name}.#{k}.pid")].each do |f|
+      def kill_pid(name = queue_name)
+        Dir[File.join(PID_DIR, "poller.#{name}.pid")].each do |f|
           begin
             puts f
             pid = IO.read(f).chomp.to_i
@@ -84,10 +84,9 @@ module MQueue
         end
         true
       end
-      alias kill! kill_pid
       
       def kill_all!
-        kill_pid('*', '*')
+        kill_pid('*')
       end
       
       def could_daemonize(use_daemonize, &block)
