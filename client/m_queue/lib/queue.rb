@@ -4,6 +4,7 @@ module MQueue
     class NoServersLeft < MQueueError; end #:nodoc:
     
     PID_DIR = File.join(MQUEUE_ROOT, 'tmp', 'pids')
+    LOG_DIR = File.join(MQUEUE_ROOT, 'log')
     
     class << self
       def run(use_daemonize = false)
@@ -132,7 +133,10 @@ module MQueue
     end
 
     def logger
-      defined?(RAILS_DEFAULT_LOGGER) ? RAILS_DEFAULT_LOGGER : Logger.new(STDOUT)
+     return @logger if @logger
+     FileUtils.mkdir_p(LOG_DIR)
+     @logger = Logger.new(File.join(LOG_DIR, queue_name + '.log'))     
+     @logger
     end
 
     def retry_attempts
