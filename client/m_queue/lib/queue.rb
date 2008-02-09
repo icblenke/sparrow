@@ -10,10 +10,19 @@ module MQueue
       def run(use_daemonize = false)
         puts "Starting #{queue_name} up..."
         could_daemonize(use_daemonize) {
+          num_sleeps = 0
           loop do
             msg = poll
             self.new.process(msg) if msg
-            sleep 0.5 if !msg
+            if !msg
+              if num_sleeps < 50
+                num_sleeps += 1
+                num_sleeps *= 2
+              end
+              sleep num_sleeps
+            else
+              num_sleeps = 0
+            end
           end
         }
       end
@@ -27,7 +36,11 @@ module MQueue
     
       def poll
         send_to_server(true) {|server|
-          server[queue_name]
+          begin
+            server[queue_name]
+          rescue => e
+            puts e
+          end
         }
       end
     
