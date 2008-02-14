@@ -85,7 +85,7 @@ module MQueue
       end
 
       def kill_pid(name = queue_name)
-        Dir[File.join(PID_DIR, "poller.#{name}.pid")].each do |f|
+        Dir[File.join(PID_DIR, "poller.#{queue_name}.pid")].each do |f|
           begin
             puts f
             pid = IO.read(f).chomp.to_i
@@ -148,7 +148,7 @@ module MQueue
     def logger
      return @logger if @logger
      FileUtils.mkdir_p(LOG_DIR)
-     @logger = Logger.new(File.join(LOG_DIR, queue_name + '.log'))     
+     @logger = Logger.new(File.join(LOG_DIR, self.class.queue_name + '.log'))     
      @logger
     end
 
