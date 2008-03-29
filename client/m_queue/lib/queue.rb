@@ -131,6 +131,7 @@ module MQueue
     end # self
     
     def process(msg)
+      reload
       1.upto(retry_attempts + 1) do |n|
         begin
           on_message(YAML.load(msg))
@@ -158,6 +159,10 @@ module MQueue
     
     def on_message(msg)
       raise 'You must implement on_message.'
+    end
+    
+    def reload
+      ActiveRecord::Base.connection.reconnect! if defined?(ActiveRecord)
     end
     
   end
