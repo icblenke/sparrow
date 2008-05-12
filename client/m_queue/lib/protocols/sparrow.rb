@@ -8,12 +8,12 @@ module MQueue
       LOG_DIR             = File.join(MQueue::MQUEUE_ROOT, 'log')
 
       CR                  = "\r\n"     
-      ERROR               = "ERROR"    
+      ERROR               = "error"    
                                
-      GET                 = "GET"      
-      SET                 = "SET"      
-      DELETE              = "DELETE"   
-      FLUSH_ALL           = "FLUSH_ALL"
+      GET                 = "get"      
+      SET                 = "set"      
+      DELETE              = "delete"   
+      FLUSH_ALL           = "flush_all"
     
       CLIENT_ERROR_REGEX  = /\ACLIENT_ERROR\s/i
       SERVER_ERROR_REGEX  = /\ASERVER_ERROR\s/i
@@ -36,7 +36,8 @@ module MQueue
         rsp = @socket.gets
         return unless rsp =~ VALUE_REGEX
         bytes = rsp.split(' ').last.to_i
-        msg = @socket.gets
+        rsp =~ /(\d+)\r/
+        msg = @socket.read $1.to_i
         @socket.gets # CR
         @socket.gets # END
         msg

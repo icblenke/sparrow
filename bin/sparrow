@@ -1,3 +1,4 @@
 #!/usr/bin/env ruby
-require File.join(File.dirname(__FILE__), '..', 'lib', 'sparrow')
+file = File.symlink?(__FILE__) ? File.readlink(__FILE__) : __FILE__
+require File.join(File.dirname(file), '..', 'lib', 'sparrow')
 Sparrow::Runner.run
