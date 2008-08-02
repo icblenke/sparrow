@@ -8,7 +8,7 @@ module Sparrow
   class SparrowError < StandardError #:nodoc:
   end
   
-  VERSION   = '0.4'
+  VERSION   = '0.4.1'
   
   @@options = {}
   
