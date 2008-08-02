@@ -31,7 +31,7 @@ module MQueue
         if defined?(RAILS_ENV) && 
           (RAILS_ENV == 'development' or
             RAILS_ENV == 'test')
-              return self.new.process(msg)
+              return self.new.on_message(msg)
         end
         send_to_server {|server|
           server[queue_name] = msg.to_yaml
