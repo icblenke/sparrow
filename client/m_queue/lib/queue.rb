@@ -136,18 +136,11 @@ module MQueue
     end # self
     
     def process(msg)
-      reload
-      1.upto(retry_attempts + 1) do |n|
-        begin
-          on_message(YAML.load(msg))
-          break
-        rescue => e
-          if n == retry_attempts + 1
-            logger.fatal "Permanently failed: " + e
-          else
-            logger.error "Retry number #{n}: " + e
-          end
-        end
+      reload!
+      begin
+        on_message(YAML.load(msg))
+      rescue => e
+        logger.error e
       end
     end
 
@@ -157,16 +150,12 @@ module MQueue
      @logger = Logger.new(File.join(LOG_DIR, self.class.queue_name + '.log'))     
      @logger
     end
-
-    def retry_attempts
-      0
-    end
     
     def on_message(msg)
       raise 'You must implement on_message.'
     end
     
-    def reload
+    def reload!
       ActiveRecord::Base.verify_active_connections! if defined?(ActiveRecord)
     end
     
