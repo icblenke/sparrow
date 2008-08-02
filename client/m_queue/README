@@ -1,13 +1,25 @@
 MQueue
 ======
 
-Introduction goes here.
-
+A client for Sparrow
+http://code.google.com/p/sparrow/
 
 Example
 =======
 
-Example goes here.
+class MyQueue < MQueue::Queue
+  def on_message(args)
+    puts "Received msg with args: #{args.inspect}"
+  end
+end
+   
+servers = [
+   MQueue::Protocols::Sparrow.new({:host => 'localhost', :port => 11212, :weight => 1})
+]
+
+MyQueue.servers = servers
+MyQueue.publish 'test'
+MyQueue.run
 
 
 Copyright (c) 2008 Alex MacCaw, released under the MIT license
