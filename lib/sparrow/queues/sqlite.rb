@@ -49,6 +49,18 @@ module Sparrow
         db.execute("DELETE FROM queues")
       end
       
+      def all
+        db.execute("SELECT * FROM queues").collect {|v| v[1] }
+      end
+      
+      def insert(values)
+        db.transaction do |d|
+          values.each do |v|
+            db.execute("INSERT INTO queues (data) VALUES (?)", v)
+          end
+        end
+      end
+      
       private 
       
       def db_path

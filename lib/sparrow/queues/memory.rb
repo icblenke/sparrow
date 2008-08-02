@@ -37,9 +37,7 @@ module Sparrow
       
       def to_disk!
         copy = self.queue_data.dup
-        copy.each do |value|
-          self.sqlite.push(value)
-        end
+        self.sqlite.insert(copy)
         self.queue_data = self.queue_data - copy
       end
       
@@ -49,9 +47,7 @@ module Sparrow
       
       def recover!
         logger.debug "Recovering queue"
-        while msg = self.sqlite.pop
-          self.push(msg)
-        end
+        self.queue_data.concat(self.sqlite.all)
       end
       
       def sqlite
