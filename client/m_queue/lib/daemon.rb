@@ -34,7 +34,7 @@ module MQueue
       end
       
       def kill_all!
-        kill_pid('*')
+        kill!('*')
       end
       
     private
