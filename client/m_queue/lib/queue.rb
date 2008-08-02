@@ -2,29 +2,34 @@ module MQueue
   class Queue
     class MQueueError < StandardError; end #:nodoc:
     class NoServersLeft < MQueueError; end #:nodoc:
+    @@queues = []
     
-    PID_DIR = File.join(MQUEUE_ROOT, 'tmp', 'pids')
     LOG_DIR = File.join(MQUEUE_ROOT, 'log')
     
     class << self
-      def run(use_daemonize = false)
-        puts "Starting #{queue_name} up..."
-        could_daemonize(use_daemonize) {
-          num_sleeps = 0
-          loop do
-            msg = poll
-            self.new.process(msg) if msg
-            if !msg
-              if num_sleeps < 50
-                num_sleeps += 1
-                num_sleeps *= 2
-              end
-              sleep num_sleeps
-            else
-              num_sleeps = 0
+      def inherited(subclass)
+        @@queues << subclass
+      end
+      
+      def queues
+        @@queues
+      end
+      
+      def run
+        num_sleeps = 0
+        loop do
+          msg = poll
+          self.new.process(msg) if msg
+          if !msg
+            if num_sleeps < 50
+              num_sleeps += 1
+              num_sleeps *= 2
             end
+            sleep num_sleeps
+          else
+            num_sleeps = 0
           end
-        }
+        end
       end
     
       def publish(msg)
@@ -80,48 +85,6 @@ module MQueue
           end
         end
         raise NoServersLeft
-      end
-      
-      # Daemon stuff
-      
-      def store_pid(pid)
-       FileUtils.mkdir_p(PID_DIR)
-       File.open(File.join(PID_DIR, "poller.#{queue_name}.pid"), 'w'){|f| f.write("#{pid}\n")}
-      end
-
-      def kill_pid(name = queue_name)
-        Dir[File.join(PID_DIR, "poller.#{queue_name}.pid")].each do |f|
-          begin
-            puts f
-            pid = IO.read(f).chomp.to_i
-            FileUtils.rm f
-            Process.kill(9, pid)
-            puts "killed PID: #{pid}"
-          rescue => e
-            puts "Failed to kill! #{f}: #{e}"
-          end
-        end
-        true
-      end
-      
-      def kill_all!
-        kill_pid('*')
-      end
-      
-      def could_daemonize(use_daemonize, &block)
-        return yield unless use_daemonize
-        fork do
-          Process.setsid
-          exit if fork
-          store_pid(Process.pid)
-          Dir.chdir File.dirname(__FILE__)
-          File.umask 0000
-          STDIN.reopen "/dev/null"
-          STDOUT.reopen "/dev/null", "a"
-          STDERR.reopen STDOUT
-          trap("TERM") { exit }
-          yield
-        end
       end
       
       def alive_servers

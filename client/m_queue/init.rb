@@ -1,9 +1,12 @@
 # Include hook code here
 require 'yaml'
-require File.join(File.dirname(__FILE__), 'lib', 'm_queue')
 
-require File.join(File.dirname(__FILE__), 'lib', 'protocols')
-require File.join(File.dirname(__FILE__), 'lib', 'queue')
+$:.unshift(File.dirname(__FILE__))
+
+require 'lib/m_queue'
+require 'lib/daemon'
+require 'lib/protocols'
+require 'lib/queue'
 
 Dir.glob(File.join(File.dirname(__FILE__), 'lib', 'protocols', '*.rb')) {|i| 
   begin
