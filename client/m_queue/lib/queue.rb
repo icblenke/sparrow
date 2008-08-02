@@ -162,7 +162,7 @@ module MQueue
     end
     
     def reload
-      ActiveRecord::Base.connection.reconnect! if defined?(ActiveRecord)
+      ActiveRecord::Base.verify_active_connections! if defined?(ActiveRecord)
     end
     
   end
