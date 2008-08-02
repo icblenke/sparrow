@@ -103,8 +103,8 @@ module MQueue
       begin
         on_message(YAML.load(msg))
       rescue => e
-        logger.error "#{ e.message } - (#{ e.class })\n" <<  
-        "#{(e.backtrace or []).join("\n")}"
+        logger.error  "\n#{ e.message } - (#{ e.class })\n" <<  
+                      "#{(e.backtrace or []).join("\n")}"
       end
     end
 
