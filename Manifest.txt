@@ -5,7 +5,6 @@ Rakefile
 bin/sparrow
 lib/sparrow.rb
 lib/sparrow/queue.rb
-lib/sparrow/queues/disk.rb
 lib/sparrow/queues/memory.rb
 lib/sparrow/queues/sqlite.rb
 lib/sparrow/runner.rb

@@ -13,6 +13,7 @@ Hoe.new('sparrow', Sparrow::VERSION) do |p|
   p.url = 'http://code.google.com/p/sparrow'
   p.changes = p.paragraphs_of('History.txt', 0..1).join("\n\n")
   p.extra_deps << ['eventmachine', '>=0.10.0']
+  p.extra_deps << ['sqlite3-ruby', '>=1.2.2']
 end
 
 # vim: syntax=Ruby

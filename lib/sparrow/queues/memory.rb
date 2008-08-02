@@ -13,26 +13,51 @@ module Sparrow
         self.queue_data = []
         self.count_pop = 0
         self.count_push = 0
+        recover!
       end
       
       def pop
         self.count_pop += 1
-        queue_data.shift
+        self.queue_data.shift
       end
       
       def push(value)
         self.count_push += 1
-        queue_data.push(value)
+        self.queue_data.push(value)
       end
       
-      def clear
+      def clear!
         self.queue_data = []
+        self.sqlite.clear!
       end
       
       def count
         queue_data.length
       end
-         
+      
+      def to_disk!
+        copy = self.queue_data.dup
+        copy.each do |value|
+          self.sqlite.push(value)
+        end
+        self.queue_data = self.queue_data - copy
+      end
+      
+      def shutdown!
+        self.to_disk!
+      end
+      
+      def recover!
+        logger.debug "Recovering queue"
+        while msg = self.sqlite.pop
+          self.push(msg)
+        end
+      end
+      
+      def sqlite
+        @sqlite ||= Sparrow::Queues::Sqlite.new(self.queue_name)
+      end
+      
     end
   end
 end

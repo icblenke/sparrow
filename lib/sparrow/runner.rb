@@ -22,7 +22,7 @@ module Sparrow
       
       self.options.merge!({
         :base_dir => base_dir,
-        :pid_dir => pid_dir,
+        :pid_dir  => pid_dir,
         :log_path => log_path
       })
       
@@ -64,6 +64,9 @@ module Sparrow
     end
     
     def stop
+      puts
+      puts "Writing queues to disk..."
+      Sparrow::Queue.shutdown!
       puts "Stopping Eventmachine Server"
       EventMachine::stop
     end
@@ -72,7 +75,7 @@ module Sparrow
       OptionParser.new do |opts|
         opts.summary_width = 25
         opts.banner = "Sparrow (#{VERSION})\n\n",
-                      "Usage: sparrow [-b path] [-t type] [-h host] [-p port] [-P file]\n",
+                      "Usage: sparrow [-b path] [-h host] [-p port] [-P file]\n",
                       "               [-d] [-k port] [-l file] [-e]\n",
                       "       sparrow --help\n",
                       "       sparrow --version\n"
@@ -82,10 +85,6 @@ module Sparrow
         
         opts.on("-b", "--base PATH", String, "Path to queue data store.", "(default: #{options[:base_dir]})") do |v|
           options[:base_dir] = File.expand_path(v)
-        end
-        
-        opts.on("-t", "--type QUEUE_TYPE", String, "Type of queue (disk/memory/sqlite).", "(default: #{options[:type]})") do |v|
-          options[:type] = v
         end
         
         opts.separator ""; opts.separator "Network:"
@@ -154,7 +153,7 @@ module Sparrow
         puts f
         pid = IO.read(f).chomp.to_i
         FileUtils.rm f
-        Process.kill(9, pid)
+        Process.kill(15, pid) # TERM
         puts "killed PID: #{pid}"
         rescue => e
           puts "Failed to kill! #{k}: #{e}"

@@ -7,12 +7,7 @@ module Sparrow
     
     class << self
       def get_queue(queue_name)
-        @@queues[queue_name] ||= case Sparrow.options[:type]
-          when 'memory': Sparrow::Queues::Memory.new(queue_name)
-          when 'sqlite': Sparrow::Queues::Sqlite.new(queue_name)
-          else
-            Sparrow::Queues::Disk.new(queue_name)
-          end
+        @@queues[queue_name] ||= Sparrow::Queues::Memory.new(queue_name)
       end
     
       def next_message(queue_name)
@@ -31,14 +26,17 @@ module Sparrow
       end
       
       def delete_all
+        @@queues.each {|name, q| q.clear! }
         @@queues = {}
-        FileUtils.rm_rf base_dir
-        FileUtils.mkdir_p base_dir
+      end
+      
+      def shutdown!
+        @@queues.each {|name, q| q.shutdown! }
       end
       
       def get_stats(queue_name)
         stats = {
-          :type =>              Sparrow.options[:type],
+          :type =>              'memory',
           :total_bytes =>       (File.size?(Sparrow.base_dir) || 0),
           :queues  =>           Dir.glob(File.join(Sparrow.base_dir, '*')).collect {|s| File.basename(s) }.join(','),
           :number_of_queues =>  queues.keys.length,
@@ -53,7 +51,6 @@ module Sparrow
         if queue_name
           queue = get_queue(queue_name)
           stats.merge!({
-            :bytes =>           Dir.glob(File.join(Sparrow.base_dir, queue_name + '**')).inject(0){|a, b| a += (File.size?(b) || 0); a },
             :total_items =>     queue.count_push, 
             :curr_items =>      queue.count
           })

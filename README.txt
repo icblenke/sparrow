@@ -11,6 +11,8 @@ Sparrow
   # The load Sparrow can cope with increases exponentially as you add to the cluster. 
   # Sparrow also takes advantage of eventmachine, which uses a non-blocking io, offering great performance.
   # 
+  # Sparrow is a in-memory queue but will persist the data to disk when receiving a term signal.
+  # 
   # Sparrow comes with built in support for daemonization and clustering. 
   # Also included are example libraries and clients. For example:
   # 

@@ -35,16 +35,17 @@ module Sparrow
     
       def pop
         id, value = db.get_first_row("SELECT * FROM queues LIMIT 1;")
+        return unless id and value
         db.execute("DELETE FROM queues WHERE id = ?", id)
         self.count_pop += 1
         value
       end
     
       def count
-        db.get_first_value("SELECT COUNT FROM queues")
+        db.get_first_value("SELECT count(*) FROM queues").to_i
       end
       
-      def clear
+      def clear!
         db.execute("DELETE FROM queues")
       end
       
