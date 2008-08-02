@@ -48,6 +48,7 @@ module Sparrow
       def recover!
         logger.debug "Recovering queue"
         self.queue_data.concat(self.sqlite.all)
+        self.sqlite.clear!
       end
       
       def sqlite
