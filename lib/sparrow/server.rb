@@ -33,7 +33,7 @@ module Sparrow
   
     VERSION         = "VERSION"
     
-    STATS           = "STATS"
+    STAT            = "STAT"
     
     SET_REGEX       = /\ASET\s/i
     ADD_REGEX       = /\AADD\s/i
@@ -43,7 +43,7 @@ module Sparrow
     QUIT_REGEX      = /\AQUIT/i
     FLUSH_ALL_REGEX = /\AFLUSH_ALL/i
     VERSION_REGEX   = /\AVERSION/i
-    STATS_REGEX     = /\ASTATS/i
+    STAT_REGEX      = /\ASTAT/i
     
     mattr_accessor :bytes_read
     mattr_accessor :bytes_written
@@ -119,8 +119,8 @@ module Sparrow
         version_command
       elsif ln =~ FLUSH_ALL_REGEX
         flush_all_command
-      elsif ln =~ STATS_REGEX
-        stats_command
+      elsif ln =~ STAT_REGEX
+        stat_command
       elsif @expecting_body
         process_body
       else
@@ -206,7 +206,7 @@ module Sparrow
       end
     end
     
-    def stats_command
+    def stat_command
       rsp = []
       stats_hash = Sparrow::Queue.get_stats(args[1])
       stats_hash.merge!({
@@ -218,7 +218,7 @@ module Sparrow
         :set_count          => self.set_count
       })
       stats_hash.each do |key, value|
-        rsp << [STATS, key, value].join(' ')
+        rsp << [STAT, key, value].join(' ')
       end
       rsp << EOF
       send_data(rsp.join(CR) + CR)
