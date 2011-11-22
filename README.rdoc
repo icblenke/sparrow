@@ -1,6 +1,8 @@
 Sparrow
     by Alex MacCaw
     http://code.google.com/p/sparrow/
+    git svn clone by Ian Blenke
+    See clustered branch for work on server clustering version
 
 == DESCRIPTION:
 
